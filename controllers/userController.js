@@ -66,13 +66,15 @@ class userController {
             }
             
             req.session.regenerate(e => {
-                if(e) res.status(500).json("Something went bad! :" + e);
+                if(e) {
+                    res.status(500).json("Something went bad! :" + e)
+                };
+
+                req.session.userId = user.rows[0].id;
+                req.session.username = user.rows[0].username;
+
+                return res.status(201).json(`Welcome back, ${req.session.id}`);
             });
-
-            req.session.userId = user.rows[0].id;
-            req.session.username = user.rows[0].username;
-
-            return res.status(201).json(`Welcome back, ${req.session.id}`);
 
         } catch(e) {
             res.status(500).json("Something went bad! :" + e.message);
