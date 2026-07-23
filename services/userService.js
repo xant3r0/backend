@@ -67,7 +67,7 @@ class userService {
     async signIn(username) {
 
         try {
-            const result = await db.query(`SELECT username,userpass FROM users WHERE username = $1;`,[username]);
+            const result = await db.query(`SELECT username,userpass,userid FROM users WHERE username = $1;`,[username]);
             return result;
         } catch {
             throw new Error("Something bad happend!");

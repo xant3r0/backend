@@ -1,5 +1,14 @@
 const userService = require('../services/userService.js');
 const bcrypt = require('bcrypt');
+const session = require('express-session');
+const store = require('connect-pg-simple')(session);
+const db = require('../db.js');
+
+const sidStore = new store({
+    pool: db,
+    createTableIfMissing: true
+});
+
 
 class userController {
     async changePassword(req,res) {
@@ -23,6 +32,11 @@ class userController {
     async deleteUser(req,res) {
         try {
             await userService.deleteUser(req.body.username,req.body.userpass);
+            req.session.destroy(e => {
+                if(e) {
+                    res.status(500).json("Something went wrong1");
+                };
+            });
             res.status(204).json("Your user account was succesfully deleted!");
         } catch(e) {
             if(e.message === "404") {
@@ -51,7 +65,10 @@ class userController {
                 return res.status(401).json("Password incorrect!");
             }
 
-            return res.status(201).json(`Welcome back, ${user.rows[0].username}`);
+            req.session.userId = user.rows[0].id;
+            req.session.username = user.rows[0].username;
+
+            return res.status(201).json(`Welcome back, ${req.session.id}`);
 
         } catch(e) {
             res.status(500).json("Something went bad! :" + e.message);
