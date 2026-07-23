@@ -15,7 +15,10 @@ app.use(express.json()).use(session({
     resave:false,
     saveUninitialized: false,
     cookie: {
-        maxAge:30 * 24 * 60 * 60 * 1000
+        maxAge:30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax'
     }
 })).use('/api',router);
 
@@ -23,3 +26,9 @@ app.use(express.json()).use(session({
 app.listen(process.env.PORT,() => {
     console.log(`Server started succesfully, port: ${process.env.PORT}`);
 });
+
+
+//  To do:
+//  1)CSRF protection;
+//  2)Add rate limiting;
+//  3)Avoid leaking stack traces(delete the errors logout on 500 status)
