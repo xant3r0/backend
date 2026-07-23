@@ -64,6 +64,10 @@ class userController {
             if(!matched) {
                 return res.status(401).json("Password incorrect!");
             }
+            
+            req.session.regenerate(e => {
+                if(e) res.status(500).json("Something went bad! :" + e);
+            });
 
             req.session.userId = user.rows[0].id;
             req.session.username = user.rows[0].username;
