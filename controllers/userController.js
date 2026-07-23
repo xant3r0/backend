@@ -1,16 +1,19 @@
 const userService = require('../services/userService.js');
 const bcrypt = require('bcrypt');
-const session = require('express-session');
-const store = require('connect-pg-simple')(session);
-const db = require('../db.js');
-
-const sidStore = new store({
-    pool: db,
-    createTableIfMissing: true
-});
 
 
 class userController {
+
+    async logOut(req,res) {
+        req.session.destroy(e => {
+            if(e) {
+                res.status(500).json(`Something went wrong: ` + e);
+            };
+
+            res.status(200).json(`Logged out succesfully!`);
+        });
+    };
+
     async changePassword(req,res) {
         try {
             await userService.changePassword(req.body.username,req.body.userpass,req.body.newpass);
