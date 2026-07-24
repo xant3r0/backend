@@ -1,7 +1,8 @@
 require('dotenv').config();
 const db = require('./db.js');
 const express = require("express");
-const router = require('./routes/userRouter.js');
+const userRouter = require('./routes/userRouter.js');
+const noteRouter = require('./routes/noteRouter.js');
 const session  = require('express-session');
 
 const app = express();
@@ -17,10 +18,10 @@ app.use(express.json()).use(session({
     cookie: {
         maxAge:30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        secure: true,
+        secure: false,
         sameSite: 'lax'
     }
-})).use('/api',router);
+})).use('/user',userRouter).use('/note',noteRouter);
 
 
 app.listen(process.env.PORT,() => {

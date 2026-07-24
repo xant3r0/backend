@@ -10,6 +10,8 @@ class userController {
                 res.status(500).json(`Something went wrong: ` + e);
             };
 
+            res.clearCookie("connect.sid");
+
             res.status(200).json(`Logged out succesfully!`);
         });
     };
@@ -28,7 +30,7 @@ class userController {
             } else {
                 console.log(e.message)
                 res.status(500).json("Something went wrong1");
-            }
+            };
         };
     };
 
@@ -73,7 +75,7 @@ class userController {
                     res.status(500).json("Something went bad! :" + e)
                 };
 
-                req.session.userId = user.rows[0].id;
+                req.session.userId = user.rows[0].userid;
                 req.session.username = user.rows[0].username;
 
                 return res.status(201).json(`Welcome back, ${req.session.id}`);
