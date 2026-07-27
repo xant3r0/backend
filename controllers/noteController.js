@@ -39,15 +39,34 @@ class noteController {
     };
 
     async editNote(req,res) {
-        
+        if(!req.session.userId) {
+            return res.status(401).json("Please login into your account!");
+        } else if(!req.body.noteId) {
+            return res.status(404).json("Select a note!");
+        } else if(!req.body.title) {
+            return res.status(404).json("Enter a title!");
+        } else if(!req.body.contents) {
+            return res.status(404).json("Type something in description!");
+        };
+
+        try {
+            const note = await noteService.editNote(req.body.title,req.body.contents,req.body.noteId,req.session.userId);
+
+            if(note.rows[0] === undefined) {
+                res.status(404).json("Note wasn't found!");
+            } else {
+                res.status(200).json("Note was succesfully changed!");
+            };
+        } catch(e) {
+            res.status(500).json("Something went wrong! : " + e.message);
+        }
     };
 
     async deleteNote(req,res) {
-
-        console.log(req.session.userId);
-
-        if(!req.body.noteId && !req.session.userId) {
+        if(!req.session.userId) {
             return res.status(401).json("Please login into your account!");
+        } else if(!req.body.noteId) {
+            return res.status(404).json("Select a note!");
         };
 
         try {
@@ -57,7 +76,7 @@ class noteController {
                 res.status(404).json("Note wasn't found!");
             } else {
                 res.status(202).json("Your note was succesfully deleted!");
-            }; 
+            };
         } catch(e) {
             res.status(500).json("Something went wrong! : " + e.message);
         };
