@@ -7,7 +7,7 @@ class userController {
     async logOut(req,res) {
         req.session.destroy(e => {
             if(e) {
-                res.status(500).json(`Something went wrong: ` + e);
+                return res.status(500).json(`Something went wrong: ` + e);
             };
 
             res.clearCookie("connect.sid");
@@ -39,10 +39,12 @@ class userController {
             await userService.deleteUser(req.body.username,req.body.userpass);
             req.session.destroy(e => {
                 if(e) {
-                    res.status(500).json("Something went wrong1");
+                    return res.status(500).json("Something went wrong1");
                 };
+
+                res.clearCookie("connect.sid");
+                res.status(204).json("Your user account was succesfully deleted!");
             });
-            res.status(204).json("Your user account was succesfully deleted!");
         } catch(e) {
             if(e.message === "404") {
                 res.status(404).json("User wasn't found!");

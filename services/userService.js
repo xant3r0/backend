@@ -44,8 +44,6 @@ class userService {
                 throw new Error("401");
             };
 
-
-
             await db.query(`DELETE FROM users WHERE username = $1`,[username]);
 
         } catch(e) {
