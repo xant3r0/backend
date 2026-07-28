@@ -90,9 +90,9 @@ class userController {
 
     async signUp(req,res) {
 
-        await userService.signUp(req.body.username,req.body.userpass);
-
         try {
+            await userService.signUp(req.body.username,req.body.userpass);
+            
             res.status(201).json("User created succesfully, now please login!!");
         } catch(e) {
             res.status(500).json(e.message);

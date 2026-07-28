@@ -54,8 +54,10 @@ class noteController {
 
             if(note.rows[0] === undefined) {
                 res.status(404).json("Note wasn't found!");
-            } else {
+            } else if(note.rowCount) {
                 res.status(200).json("Note was succesfully changed!");
+            } else {
+                throw new Error();
             };
         } catch(e) {
             res.status(500).json("Something went wrong! : " + e.message);
@@ -74,8 +76,10 @@ class noteController {
 
             if(note.rows[0] === undefined) {
                 res.status(404).json("Note wasn't found!");
-            } else {
+            } else if(note.rowCount) {
                 res.status(202).json("Your note was succesfully deleted!");
+            } else {
+                throw new Error();
             };
         } catch(e) {
             res.status(500).json("Something went wrong! : " + e.message);

@@ -5,7 +5,7 @@ class noteService {
         try {
             const notes = await db.query('SELECT * FROM notes WHERE userid = $1',[id]);
 
-            return notes.rows[0];
+            return notes;
         } catch(e) {
             throw new Error("Something bad happened! : " + e.message);
         };
@@ -13,7 +13,7 @@ class noteService {
 
     async createNote(title,contents,id) {
         try {
-            const note = db.query('INSERT INTO notes (title,contents,createdat,userid) VALUES ($1,$2,NOW(),$3)',[title,contents,id]);
+            const note = await db.query('INSERT INTO notes (title,contents,createdat,userid) VALUES ($1,$2,NOW(),$3)',[title,contents,id]);
 
             return note;
         } catch(e) {

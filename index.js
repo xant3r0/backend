@@ -23,9 +23,15 @@ app.use(express.json()).use(session({
     }
 })).use('/user',userRouter).use('/note',noteRouter);
 
+//const test = async () => {
+    //const note = await db.query(`INSERT INTO notes VALUES (16,'Nigger','Nigger',NOW(),29)`);
+    //console.log(note);
+//}
+
 
 app.listen(process.env.PORT,() => {
     console.log(`Server started succesfully, port: ${process.env.PORT}`);
+    //test();
 });
 
 
