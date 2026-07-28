@@ -84,8 +84,8 @@ class userController {
             });
 
         } catch(e) {
-            res.status(500).json("Something went bad! :" + e.message);
-        }
+            res.status(500).json("Something went bad!");
+        };
     };
 
     async signUp(req,res) {

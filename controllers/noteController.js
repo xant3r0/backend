@@ -15,7 +15,7 @@ class noteController {
                 return res.status(201).json(notes);
             };
         } catch(e) {
-            res.status(500).json("Something went wrong! : " + e.message);
+            res.status(500).json("Something went wrong!");
         };
         
     };
@@ -34,7 +34,7 @@ class noteController {
 
             res.status(201).json("Your note succesfully was added!");
         } catch(e) {
-            res.status(500).json("Something went wrong! : " + e.message);
+            res.status(500).json("Something went wrong!");
         };
     };
 
@@ -62,7 +62,7 @@ class noteController {
                 throw new Error();
             };
         } catch(e) {
-            res.status(500).json("Something went wrong! : " + e.message);
+            res.status(500).json("Something went wrong!");
         }
     };
 
@@ -86,7 +86,7 @@ class noteController {
                 throw new Error();
             };
         } catch(e) {
-            res.status(500).json("Something went wrong! : " + e.message);
+            res.status(500).json("Something went wrong!");
         };
     };
 };
