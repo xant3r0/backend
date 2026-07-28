@@ -39,9 +39,11 @@ class noteController {
     };
 
     async editNote(req,res) {
+        const  { noteId } = req.params.id;
+
         if(!req.session.userId) {
             return res.status(401).json("Please login into your account!");
-        } else if(!req.body.noteId) {
+        } else if(!noteId) {
             return res.status(404).json("Select a note!");
         } else if(!req.body.title) {
             return res.status(404).json("Enter a title!");
@@ -50,7 +52,7 @@ class noteController {
         };
 
         try {
-            const note = await noteService.editNote(req.body.title,req.body.contents,req.body.noteId,req.session.userId);
+            const note = await noteService.editNote(req.body.title,req.body.contents,noteId,req.session.userId);
 
             if(note.rows[0] === undefined) {
                 res.status(404).json("Note wasn't found!");
@@ -65,14 +67,16 @@ class noteController {
     };
 
     async deleteNote(req,res) {
+        const  { noteId } = req.params.id;
+
         if(!req.session.userId) {
             return res.status(401).json("Please login into your account!");
-        } else if(!req.body.noteId) {
+        } else if(!noteId) {
             return res.status(404).json("Select a note!");
         };
 
         try {
-            const note = await noteService.deleteNote(req.body.noteId,req.session.userId);
+            const note = await noteService.deleteNote(noteId,req.session.userId);
 
             if(note.rows[0] === undefined) {
                 res.status(404).json("Note wasn't found!");

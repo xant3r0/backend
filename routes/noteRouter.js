@@ -3,9 +3,9 @@ const noteController = require('../controllers/noteController.js');
 
 const noteRouter = new Router();
 
-noteRouter.get('/getNotes',noteController.getNotes);
-noteRouter.post('/addNote',noteController.createNote);
-noteRouter.put('/editNote',noteController.editNote);
-noteRouter.delete('/deleteNote',noteController.deleteNote);
+noteRouter.get('/notes',noteController.getNotes);
+noteRouter.post('/notes',noteController.createNote);
+noteRouter.put('/notes/:id',noteController.editNote);
+noteRouter.delete('/notes/:id',noteController.deleteNote);
 
 module.exports = noteRouter;
