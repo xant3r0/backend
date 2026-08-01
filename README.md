@@ -1,5 +1,5 @@
 # Notes App (Backend)
-## Notes App Backend with Session authentication and basic functionality
+### Notes App Backend with Session authentication and basic functionality
 
 ## Tech Stack
 1. Express.js
