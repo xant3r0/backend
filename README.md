@@ -16,7 +16,7 @@
 - pg;
 
 ## Installation & Setup
-1. Make sure that you have installed node.js on your system. You can install it from [Link text](https://nodejs.org/en);
+1. Make sure that you have installed node.js on your system. You can install it from [here](https://nodejs.org/en);
 2. Use `git clone https://github.com/username/repo.git` to install the repo;
 3. Use `npm install ` to install all dependencies;
 4. Configure the .env file so the server starts correctly and it can connect with DB;
