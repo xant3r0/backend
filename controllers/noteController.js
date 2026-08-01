@@ -2,9 +2,6 @@ const noteService = require('../services/noteService.js');
 
 class noteController {
     async getNotes(req,res) {
-        if(!req.session.userId) {
-            return res.status(401).json("Please login into your account!");
-        };
 
         try {
             const notes = await noteService.getNotes(req.session.userId);
@@ -12,7 +9,7 @@ class noteController {
             if(!notes) {
                 return res.status(200).json("At the moment you don't have any notes!");
             } else {
-                return res.status(201).json(notes);
+                return res.status(200).json(notes);
             };
         } catch(e) {
             res.status(500).json("Something went wrong!");
@@ -21,9 +18,6 @@ class noteController {
     };
 
     async createNote(req,res) {
-        if(!req.session.userId) {
-            return res.status(401).json("Please login into your account!");
-        };
 
         if(!req.body.title && req.body.contents) {
             return res.status(400).json("Complete both title and content inputs!");
@@ -39,16 +33,14 @@ class noteController {
     };
 
     async editNote(req,res) {
-        const  { noteId } = req.params.id;
+        const noteId = req.params.id;
 
-        if(!req.session.userId) {
-            return res.status(401).json("Please login into your account!");
-        } else if(!noteId) {
-            return res.status(404).json("Select a note!");
+        if(!noteId) {
+            return res.status(400).json("Select a note!");
         } else if(!req.body.title) {
-            return res.status(404).json("Enter a title!");
+            return res.status(400).json("Enter a title!");
         } else if(!req.body.contents) {
-            return res.status(404).json("Type something in description!");
+            return res.status(400).json("Type something in description!");
         };
 
         try {
@@ -67,12 +59,10 @@ class noteController {
     };
 
     async deleteNote(req,res) {
-        const  { noteId } = req.params.id;
+        const noteId = req.params.id;
 
-        if(!req.session.userId) {
-            return res.status(401).json("Please login into your account!");
-        } else if(!noteId) {
-            return res.status(404).json("Select a note!");
+        if(!noteId) {
+            return res.status(400).json("Select a note!");
         };
 
         try {
@@ -81,7 +71,7 @@ class noteController {
             if(note.rows[0] === undefined) {
                 res.status(404).json("Note wasn't found!");
             } else if(note.rowCount) {
-                res.status(202).json("Your note was succesfully deleted!");
+                res.sendStatus(204);
             } else {
                 throw new Error();
             };

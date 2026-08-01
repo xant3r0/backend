@@ -1,7 +1,6 @@
 const userService = require('../services/userService.js');
 const bcrypt = require('bcrypt');
 
-
 class userController {
 
     async logOut(req,res) {
@@ -12,7 +11,7 @@ class userController {
 
             res.clearCookie("connect.sid");
 
-            res.status(200).json(`Logged out succesfully!`);
+            res.sendStatus(204);
         });
     };
 
@@ -26,7 +25,7 @@ class userController {
             } else if(e.message === "401") {
                 res.status(401).json("Incorrect password!");
             } else if(e.message === "405") {
-                res.status(405).json("Password you entered is too weak!");
+                res.status(400).json("Password you entered is too weak!");
             } else {
                 console.log(e.message)
                 res.status(500).json("Something went wrong1");
@@ -43,7 +42,7 @@ class userController {
                 };
 
                 res.clearCookie("connect.sid");
-                res.status(204).json("Your user account was succesfully deleted!");
+                res.sendStatus(204);
             });
         } catch(e) {
             if(e.message === "404") {
@@ -80,7 +79,7 @@ class userController {
                 req.session.userId = user.rows[0].userid;
                 req.session.username = user.rows[0].username;
 
-                return res.status(201).json(`Welcome back, ${req.session.id}`);
+                return res.status(200).json(`Welcome back, ${req.session.id}`);
             });
 
         } catch(e) {
