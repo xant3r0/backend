@@ -1,6 +1,7 @@
 # Notes App (Backend)
 
-## Notes App Backend with Session authentication and basic functionality
+## Description
+Notes App Backend with Session authentication and basic functionality
 
 ## Tech Stack
 - Node.js
@@ -25,7 +26,7 @@
 - To start server in dev, use `npm run dev`;
 - To start server in prod, user `npm start`;
 
-# API Endpoints
+## API Endpoints
 
 - POST /auth/login -> login;
 - POST /auth/register -> register;
@@ -36,3 +37,14 @@
 - POST /notes -> create notes;
 - PUT /notes/:id -> change note;
 - DELETE /notes/:id -> delete note;
+
+## Enviroment variables
+
+```bash
+PORT=your-server-port
+USER=your-postgree-user
+PASSWORD=your-postgree-password
+HOST=your-server-host-name
+DBPORT=your-db-port
+DB=your-db-name
+SESS_SECRET=your-session-secret
