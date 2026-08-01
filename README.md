@@ -28,11 +28,11 @@ Notes App Backend with Session authentication and basic functionality
 
 ## API Endpoints
 
-- POST /auth/login -> login;
-- POST /auth/register -> register;
-- PUT /auth/change-password -> change password;
-- DELETE /auth/delete-user -> delete user;
-- POST /auth/logout -> logout;
+- POST /login -> login;
+- POST /register -> register;
+- PUT /change-password -> change password;
+- DELETE /delete-user -> delete user;
+- POST /logout -> logout;
 - GET /notes -> get notes;
 - POST /notes -> create notes;
 - PUT /notes/:id -> change note;

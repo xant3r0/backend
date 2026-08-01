@@ -21,7 +21,7 @@ app.use(express.json()).use(session({
         secure: false,
         sameSite: 'lax'
     }
-})).use('/auth',userRouter).use('/',noteRouter);
+})).use('/',userRouter).use('/',noteRouter);
 
 //const test = async () => {
     //const note = await db.query(`INSERT INTO notes VALUES (16,'Nigger','Nigger',NOW(),29)`);
