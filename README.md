@@ -5,7 +5,7 @@
 1. Express.js
 2. Postgree SQL
 
-## Used libraries
+### Used libraries
 1. bcrypt
 2. nodemon
 3. connect-pg-simple
@@ -13,5 +13,5 @@
 5. express-session
 6. pg
 
-## Installation & Setup
+### Installation & Setup
 
