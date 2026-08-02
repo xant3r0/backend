@@ -1,99 +1,135 @@
 const db = require('../db.js');
 const bcrypt = require('bcrypt');
 
-class userService {
+class UserService {
+
+    async findUser(username) {
+
+        try {
+            const result = await db.query(`SELECT username,userpass,userid FROM users WHERE username = $1`,[username]);
+            return result.rows[0] || null;
+        } catch(e) {
+            
+            this.catchErr(e);
+
+        };
+    };
+
+    existsUser(user) {
+        if(user === null) {
+            const err = new Error("User wasn't found!");
+            err.statusCode = 404;
+            throw err;
+        };
+
+        return true;
+    };
+
+    async verifyPassword(user,userpass) {
+        const matched = await bcrypt.compare(userpass,user.userpass);
+        
+        if(!matched) {
+            const err = new Error("Wrong password!");
+            err.statusCode = 401;
+            throw err;
+        };
+
+        return true;
+    };
+
+    catchErr(e) {
+        if(e.statusCode) {
+            throw e;
+        };
+
+        const err = new Error("Something went wrong on the server, please try again later!");
+        err.statusCode = 500;
+        err.orig = e;
+        throw err;
+    };
 
     async changePassword(username,userpass,newpass) {
+
+        if(userpass === newpass) {
+            const err = new Error("Use a new password!");
+            err.statusCode = 400;
+            throw err;
+        };
+
         try {
-            const user = await this.signIn(username,userpass);
+            const user = await this.findUser(username);
 
-            if(user.rows[0] === undefined) {
-                throw new Error("404");
-            };
+            this.existsUser(user);
                     
-            const matched = await bcrypt.compare(userpass,user.rows[0].userpass);
-        
-            if(!matched) {
-                throw new Error("401");
-            };
-
-            if(!this.validatePassword(newpass)) {
-                throw new Error("405");
-            }
+            await this.verifyPassword(user,userpass);
 
             const newHashPass = await bcrypt.hash(newpass,10);
 
-            await db.query(`UPDATE users SET userpass = $1 WHERE username = $2`,[newHashPass,username]);
+            const result = await db.query(`UPDATE users SET userpass = $1 WHERE username = $2 RETURNING userid,username`,[newHashPass,username]);
+
+            if(result.rowCount === 0) {
+                const err = new Error("Something went wrong on the server, please try again later!");
+                err.statusCode = 500;
+                throw err;
+            };
+
+            return result.rows[0];
 
         } catch(e) {
-            throw new Error(e.message);
-        }
-    }
+
+            this.catchErr(e);
+
+        };
+    };
 
     async deleteUser(username, userpass) {
+
         try {
-            const user = await this.signIn(username,userpass);
+            const user = await this.findUser(username);
 
-            if(user.rows[0] === undefined) {
-                throw new Error("404");
-            };
+            this.existsUser(user);
                     
-            const matched = await bcrypt.compare(userpass,user.rows[0].userpass);
-        
-            if(!matched) {
-                throw new Error("401");
+            await this.verifyPassword(user,userpass);
+
+            const result = await db.query(`DELETE FROM users WHERE username = $1 RETURNING username,userid`,[username]);
+
+            if(result.rowCount === 0) {
+                const err = new Error("Something went wrong on the server, please try again later!");
+                err.statusCode = 500;
+                throw err;
             };
 
-            await db.query(`DELETE FROM users WHERE username = $1`,[username]);
+            return result.rows[0];
 
         } catch(e) {
-            throw new Error(e.message);
-        }
-        
-    }
 
-    validateUsername(username) {
-        const regex = /^[a-zA-Z][a-zA-Z0-9_]{2,19}$/;
-        return regex.test(username);
-    };
+            this.catchErr(e);
 
-    validatePassword(password) {
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        return regex.test(password);
-    };
-
-    async signIn(username) {
-
-        try {
-            const result = await db.query(`SELECT username,userpass,userid FROM users WHERE username = $1;`,[username]);
-            return result;
-        } catch {
-            throw new Error("Something bad happend!");
         };
+        
     };
 
     async signUp(username,userpass) {
-        
-        if(!this.validateUsername(username) || !this.validatePassword(userpass)) {
-            throw new Error("Try another username and/or password!");
-        };
 
         try {
-            const unique = await db.query(`SELECT username FROM users WHERE username = $1`,[username]);
 
-            if(unique.rows[0]) {
-                throw new Error("User with this username already exists!");
-            } else {
-                const hashPass = await bcrypt.hash(userpass,10);
-                const result = await db.query(`INSERT INTO users (username,userpass,createdat) VALUES ($1, $2, NOW());`,[username, hashPass]);
+            const hashPass = await bcrypt.hash(userpass,10);
+            const result = await db.query(`INSERT INTO users (username,userpass,createdat) VALUES ($1, $2, NOW()) RETURNING userid, username, createdat`,[username, hashPass]);
 
-                return result;
-            };
+            return result.rows[0];
 
         } catch(e) {
-            throw new Error(e.message);
+
+            if(e.code === '23505') {
+                const err = new Error("User with this username already exists!");
+                err.statusCode = 409;
+                throw err;
+            };
+
+            this.catchErr(e);
+
         };
     };
 };
 
-module.exports = new userService();
+module.exports = new UserService();
