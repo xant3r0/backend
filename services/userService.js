@@ -10,7 +10,7 @@ class UserService {
             return result.rows[0] || null;
         } catch(e) {
             
-            this.catchErr(e);
+            this.wrapErr(e);
 
         };
     };
@@ -21,8 +21,6 @@ class UserService {
             err.statusCode = 404;
             throw err;
         };
-
-        return true;
     };
 
     async verifyPassword(user,userpass) {
@@ -33,11 +31,9 @@ class UserService {
             err.statusCode = 401;
             throw err;
         };
-
-        return true;
     };
 
-    catchErr(e) {
+    wrapErr(e) {
         if(e.statusCode) {
             throw e;
         };
@@ -46,6 +42,14 @@ class UserService {
         err.statusCode = 500;
         err.orig = e;
         throw err;
+    };
+
+    async auth(username,userpass) {
+        const user = await this.findUser(username);
+
+        this.existsUser(user);
+                    
+        await this.verifyPassword(user,userpass);
     };
 
     async changePassword(username,userpass,newpass) {
@@ -57,11 +61,8 @@ class UserService {
         };
 
         try {
-            const user = await this.findUser(username);
-
-            this.existsUser(user);
-                    
-            await this.verifyPassword(user,userpass);
+            
+            await this.auth(username,userpass);
 
             const newHashPass = await bcrypt.hash(newpass,10);
 
@@ -77,7 +78,7 @@ class UserService {
 
         } catch(e) {
 
-            this.catchErr(e);
+            this.wrapErr(e);
 
         };
     };
@@ -85,11 +86,8 @@ class UserService {
     async deleteUser(username, userpass) {
 
         try {
-            const user = await this.findUser(username);
-
-            this.existsUser(user);
-                    
-            await this.verifyPassword(user,userpass);
+            
+            await this.auth(username,userpass);
 
             const result = await db.query(`DELETE FROM users WHERE username = $1 RETURNING username,userid`,[username]);
 
@@ -103,7 +101,7 @@ class UserService {
 
         } catch(e) {
 
-            this.catchErr(e);
+            this.wrapErr(e);
 
         };
         
@@ -126,7 +124,7 @@ class UserService {
                 throw err;
             };
 
-            this.catchErr(e);
+            this.wrapErr(e);
 
         };
     };
