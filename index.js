@@ -4,6 +4,7 @@ const express = require("express");
 const userRouter = require('./routes/userRouter.js');
 const noteRouter = require('./routes/noteRouter.js');
 const session  = require('express-session');
+const errorMiddleware = require('./middleware/error.js');
 
 const app = express();
 
@@ -22,6 +23,8 @@ app.use(express.json()).use(session({
         sameSite: 'lax'
     }
 })).use('/',userRouter).use('/',noteRouter);
+
+app.use(errorMiddleware);
 
 //const test = async () => {
     //const note = await db.query(`INSERT INTO notes VALUES (16,'Nigger','Nigger',NOW(),29)`);
