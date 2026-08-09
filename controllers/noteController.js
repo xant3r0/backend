@@ -9,9 +9,9 @@ class noteController {
             const notes = await noteService.getNotes(userId);
 
             if(!notes.length) {
-                return res.status(200).json({success:true,message:"At the moment you don't have any notes!"});
+                return res.status(200).json({success:true,message:"At the moment you don't have any notes!",data:[]});
             } else {
-                return res.status(200).json({success:true,message:notes});
+                return res.status(200).json({success:true,message:"Here are your notes!",data:notes});
             };
         } catch(e) {
             return next(e);
@@ -31,7 +31,7 @@ class noteController {
         try {
             const note = await noteService.createNote(title,contents,userId);
 
-            res.status(201).json({success:true,message:"Your note succesfully was added!"});
+            return res.status(201).json({success:true,message:"Your note was succesfully added!",data:{"id":note.noteid,"title":note.title,"contents":note.contents,"createdAt":note.createdat}});
         } catch(e) {
             return next(e);
         };
@@ -50,9 +50,9 @@ class noteController {
             const note = await noteService.editNote(title,contents,noteId,userId);
 
             if(!note) {
-                res.status(404).json({success:false,message:"Note wasn't found!"});
+                return res.status(404).json({success:false,message:"Note wasn't found!"});
             } else {
-                res.status(200).json({success:true,message:"Your note was succesfully updated!"});
+                return res.status(200).json({success:true,message:"Your note was succesfully updated!",data:{"id":note.noteid,"title":note.title,"contents":note.contents,"createdAt":note.createdat}});
             };
         } catch(e) {
             return next(e);
@@ -71,9 +71,9 @@ class noteController {
             const note = await noteService.deleteNote(noteId,userId);
 
             if(!note) {
-                res.status(404).json({success:false,message:"Note wasn't found!"});
+                return res.status(404).json({success:false,message:"Note wasn't found!"});
             } else {
-                res.sendStatus(204);
+                return res.sendStatus(204);
             };
         } catch(e) {
             return next(e);
