@@ -25,7 +25,7 @@ class noteService {
 
     async createNote(title,contents,id) {
         try {
-            const note = await db.query('INSERT INTO notes (title,contents,createdat,userid) VALUES ($1,$2,NOW(),$3) RETURNING createdat',[title,contents,id]);
+            const note = await db.query('INSERT INTO notes (title,contents,createdat,userid) VALUES ($1,$2,NOW(),$3) RETURNING noteid,title,contents,createdat',[title,contents,id]);
 
             return note.rows[0];
         } catch(e) {
@@ -35,7 +35,7 @@ class noteService {
 
     async editNote(title,contents,noteid,userid) {
         try {
-            const note = await db.query("UPDATE notes SET title = $1, contents = $2 WHERE noteid = $3 AND userid = $4 RETURNING noteid",[title,contents,noteid,userid]);
+            const note = await db.query("UPDATE notes SET title = $1, contents = $2 WHERE noteid = $3 AND userid = $4 RETURNING noteid,title,contents,createdat",[title,contents,noteid,userid]);
 
             return note.rows[0];
         } catch(e) {
@@ -45,7 +45,7 @@ class noteService {
 
     async deleteNote(noteid,userid) {
         try {
-            const note = await db.query("DELETE FROM notes WHERE noteid = $1 and userid = $2 RETURNING noteid",[noteid,userid]);
+            const note = await db.query("DELETE FROM notes WHERE noteid = $1 and userid = $2 RETURNING noteid,title,contents,createdat",[noteid,userid]);
 
             return note.rows[0];
         } catch(e) {
