@@ -36,7 +36,7 @@ class userController {
                 req.session.userId = await userService.findUserId(username);
                 req.session.username = username;
 
-                res.status(200).json("Your password has succesfully changed!");
+                res.status(200).json({success:true,message:"Your password has succesfully changed!",data:null});
             });
         } catch(e) {
             return next(e);
@@ -84,7 +84,7 @@ class userController {
                 req.session.userId = await userService.findUserId(username);
                 req.session.username = username;
 
-                return res.status(200).json(`Welcome back, ${username}`);
+                return res.status(200).json({success:true,message:"You logged in succesfully!",data:{"id":user.userid,"username":user.username}});
             });
 
         } catch(e) {
@@ -96,8 +96,8 @@ class userController {
         const { username, userpass } = req.body;
 
         try {
-            await userService.signUp(username,userpass);
-            res.status(201).json("User created succesfully, now please login!!");
+            const user = await userService.signUp(username,userpass);
+            res.status(201).json({success:true,message:"User created succesfully!",data:{"id":user.userid,"username":user.username}});
         } catch(e) {
             return next(e);
         };
