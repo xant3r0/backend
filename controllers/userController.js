@@ -71,7 +71,7 @@ class userController {
 
         try {
 
-            await userService.auth(username,userpass);
+            const user = await userService.auth(username,userpass);
             
             await req.session.regenerate( async (e) => {
                 if(e) {

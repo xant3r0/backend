@@ -56,6 +56,8 @@ class UserService {
         this.existsUser(user);
                     
         await this.verifyPassword(user,userpass);
+
+        return user;
     };
 
     async changePassword(username,userpass,newpass) {
