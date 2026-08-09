@@ -3,80 +3,80 @@ const noteService = require('../services/noteService.js');
 class noteController {
     async getNotes(req,res) {
 
-        try {
-            const notes = await noteService.getNotes(req.session.userId);
+        const { userId } = req.session; 
 
-            if(!notes) {
-                return res.status(200).json("At the moment you don't have any notes!");
+        try {
+            const notes = await noteService.getNotes(userId);
+
+            if(!notes.length) {
+                return res.status(200).json({success:true,message:"At the moment you don't have any notes!"});
             } else {
-                return res.status(200).json(notes);
+                return res.status(200).json({success:true,message:notes});
             };
         } catch(e) {
-            res.status(500).json("Something went wrong!");
+            return next(e);
         };
         
-    };
+    }; 
 
     async createNote(req,res) {
 
-        if(!req.body.title && req.body.contents) {
-            return res.status(400).json("Complete both title and content inputs!");
+        const {title, contents} = req.body;
+        const { userId } = req.session; 
+
+        if(!title || !contents) {
+            return res.status(400).json({success:false,message:"Complete both title and content inputs!"});
         };
 
         try {
-            const note = await noteService.createNote(req.body.title,req.body.contents,req.session.userId);
+            const note = await noteService.createNote(title,contents,userId);
 
-            res.status(201).json("Your note succesfully was added!");
+            res.status(201).json({success:true,message:"Your note succesfully was added!"});
         } catch(e) {
-            res.status(500).json("Something went wrong!");
+            return next(e);
         };
     };
 
     async editNote(req,res) {
         const noteId = req.params.id;
+        const {title, contents} = req.body;
+        const { userId } = req.session; 
 
-        if(!noteId) {
-            return res.status(400).json("Select a note!");
-        } else if(!req.body.title) {
-            return res.status(400).json("Enter a title!");
-        } else if(!req.body.contents) {
-            return res.status(400).json("Type something in description!");
+        if(!noteId || !title || !contents || !userId) {
+            return res.status(400).json({success:false,message:"Bad request!"});
         };
 
         try {
-            const note = await noteService.editNote(req.body.title,req.body.contents,noteId,req.session.userId);
+            const note = await noteService.editNote(title,contents,noteId,userId);
 
-            if(note.rows[0] === undefined) {
-                res.status(404).json("Note wasn't found!");
-            } else if(note.rowCount) {
-                res.status(200).json("Note was succesfully changed!");
+            if(!note) {
+                res.status(404).json({success:false,message:"Note wasn't found!"});
             } else {
-                throw new Error();
+                res.status(200).json({success:true,message:"Your note was succesfully updated!"});
             };
         } catch(e) {
-            res.status(500).json("Something went wrong!");
+            return next(e);
         }
     };
 
     async deleteNote(req,res) {
         const noteId = req.params.id;
+        const { userId } = req.session; 
 
         if(!noteId) {
-            return res.status(400).json("Select a note!");
+            return res.status(400).json({success:false,message:"Select a note!"});
         };
 
         try {
-            const note = await noteService.deleteNote(noteId,req.session.userId);
+            const note = await noteService.deleteNote(noteId,userId);
 
-            if(note.rows[0] === undefined) {
-                res.status(404).json("Note wasn't found!");
-            } else if(note.rowCount) {
-                res.sendStatus(204);
+            if(!note) {
+                res.status(404).json({success:false,message:"Note wasn't found!"});
             } else {
-                throw new Error();
+                res.sendStatus(204);
             };
         } catch(e) {
-            res.status(500).json("Something went wrong!");
+            return next(e);
         };
     };
 };
