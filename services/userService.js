@@ -3,6 +3,12 @@ const bcrypt = require('bcrypt');
 
 class UserService {
 
+    async findUserId(username) {
+        const result = await db.query(`SELECT userid FROM users WHERE username = $1`,[username]);
+
+        return result.rows[0].userid;
+    };
+
     async findUser(username) {
 
         try {
@@ -54,15 +60,15 @@ class UserService {
 
     async changePassword(username,userpass,newpass) {
 
-        if(userpass === newpass) {
-            const err = new Error("Use a new password!");
-            err.statusCode = 400;
-            throw err;
-        };
-
         try {
             
             await this.auth(username,userpass);
+
+            if(userpass === newpass) {
+                const err = new Error("Use a new password!");
+                err.statusCode = 400;
+                throw err;
+            };
 
             const newHashPass = await bcrypt.hash(newpass,10);
 
