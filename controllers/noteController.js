@@ -1,7 +1,7 @@
 const noteService = require('../services/noteService.js');
 
 class noteController {
-    async getNotes(req,res) {
+    async getNotes(req,res,next) {
 
         const { userId } = req.session; 
 
@@ -19,7 +19,7 @@ class noteController {
         
     }; 
 
-    async createNote(req,res) {
+    async createNote(req,res,next) {
 
         const {title, contents} = req.body;
         const { userId } = req.session; 
@@ -37,7 +37,7 @@ class noteController {
         };
     };
 
-    async editNote(req,res) {
+    async editNote(req,res,next) {
         const noteId = req.params.id;
         const {title, contents} = req.body;
         const { userId } = req.session; 
@@ -59,7 +59,7 @@ class noteController {
         }
     };
 
-    async deleteNote(req,res) {
+    async deleteNote(req,res,next) {
         const noteId = req.params.id;
         const { userId } = req.session; 
 
