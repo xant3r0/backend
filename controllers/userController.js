@@ -3,10 +3,13 @@ const bcrypt = require('bcrypt');
 
 class userController {
 
-    async logOut(req,res) {
-        req.session.destroy(e => {
+    async logOut(req,res,next) {
+        await req.session.destroy(e => {
             if(e) {
-                return res.status(500).json(`Something went wrong: ` + e);
+                const err = new Error("Something went wrong on the server, please try again later!");
+                err.statusCode = 500;
+                err.orig = e;
+                return next(err);
             };
 
             res.clearCookie("connect.sid");
@@ -15,88 +18,89 @@ class userController {
         });
     };
 
-    async changePassword(req,res) {
+    async changePassword(req,res,next) {
+
+        const { username, userpass, newpass } = req.body;
+
         try {
-            await userService.changePassword(req.body.username,req.body.userpass,req.body.newpass);
-            res.status(200).json("Your password has succesfully changed!");
+            await userService.changePassword(username,userpass,newpass);
+
+            await req.session.regenerate( async (e) => {
+                if(e) {
+                    const err = new Error("Something went wrong on the server, please try again later!");
+                    err.statusCode = 500;
+                    err.orig = e;
+                    return next(err);
+                };
+
+                req.session.userId = await userService.findUserId(username);
+                req.session.username = username;
+
+                res.status(200).json("Your password has succesfully changed!");
+            });
         } catch(e) {
-            if(e.message === "404") {
-                res.status(404).json("User wasn't found!");
-            } else if(e.message === "401") {
-                res.status(401).json("Incorrect password!");
-            } else if(e.message === "405") {
-                res.status(400).json("Password you entered is too weak!");
-            } else {
-                console.log(e.message)
-                res.status(500).json("Something went wrong1");
-            };
+            return next(e);
         };
     };
 
-    async deleteUser(req,res) {
+    async deleteUser(req,res,next) {
+
+        const { username, userpass } = req.body;
+
         try {
-            await userService.deleteUser(req.body.username,req.body.userpass);
-            req.session.destroy(e => {
+            await userService.deleteUser(username,userpass);
+            await req.session.destroy(e => {
                 if(e) {
-                    return res.status(500).json("Something went wrong1");
+                    const err = new Error("Something went wrong on the server, please try again later!");
+                    err.statusCode = 500;
+                    err.orig = e;
+                    return next(err);
                 };
 
                 res.clearCookie("connect.sid");
                 res.sendStatus(204);
             });
         } catch(e) {
-            if(e.message === "404") {
-                res.status(404).json("User wasn't found!");
-            } else if(e.message === "401") {
-                res.status(401).json("Incorrect password!");
-            } else {
-                console.log(e.message)
-                res.status(500).json("Something went wrong1");
-            }
-        };
-    }
-
-    async signIn(req,res) {
-
-        try {
-            const user = await userService.signIn(req.body.username);
-
-            if(user.rows[0] === undefined) {
-                return res.status(404).json("User wasn't found!");
-            };
-            
-            const matched = await bcrypt.compare(req.body.userpass,user.rows[0].userpass);
-
-            if(!matched) {
-                return res.status(401).json("Password incorrect!");
-            }
-            
-            req.session.regenerate(e => {
-                if(e) {
-                    res.status(500).json("Something went bad! :" + e)
-                };
-
-                req.session.userId = user.rows[0].userid;
-                req.session.username = user.rows[0].username;
-
-                return res.status(200).json(`Welcome back, ${req.session.id}`);
-            });
-
-        } catch(e) {
-            res.status(500).json("Something went bad!");
+            return next(e);
         };
     };
 
-    async signUp(req,res) {
+    async signIn(req,res,next) {
+
+        const { username, userpass } = req.body;
 
         try {
-            await userService.signUp(req.body.username,req.body.userpass);
+
+            await userService.auth(username,userpass);
             
+            await req.session.regenerate( async (e) => {
+                if(e) {
+                    const err = new Error("Something went wrong on the server, please try again later!");
+                    err.statusCode = 500;
+                    err.orig = e;
+                    return next(err);
+                };
+
+                req.session.userId = await userService.findUserId(username);
+                req.session.username = username;
+
+                return res.status(200).json(`Welcome back, ${username}`);
+            });
+
+        } catch(e) {
+            return next(e);
+        };
+    };
+
+    async signUp(req,res,next) {
+        const { username, userpass } = req.body;
+
+        try {
+            await userService.signUp(username,userpass);
             res.status(201).json("User created succesfully, now please login!!");
         } catch(e) {
-            res.status(500).json(e.message);
+            return next(e);
         };
-
     };
 };
 
